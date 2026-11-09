@@ -112,247 +112,201 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <main class="max-w-[1550px] mx-auto px-3 sm:px-4 py-3 space-y-3">
 
-        <!-- KPI Metrics Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+        <!-- KPI Metrics Grid (Ultra-Compacto) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+            <div class="bg-white dark:bg-slate-900/90 rounded-xl p-2.5 px-3.5 border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center justify-between">
                 <div>
-                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Total Licencias</span>
-                    <span class="text-2xl font-black text-slate-900 dark:text-white mt-1 block" x-text="licenses.length"></span>
-                    <span class="text-[10px] text-slate-400 dark:text-slate-500">Sistemas bajo control</span>
+                    <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Total Licencias</span>
+                    <span class="text-lg font-black text-slate-900 dark:text-white block leading-tight" x-text="licenses.length"></span>
+                    <span class="text-[9px] text-slate-400">Sistemas bajo control</span>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl border border-blue-500/20">
+                <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm border border-blue-500/20">
                     <i class="fa-solid fa-id-badge"></i>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <div class="bg-white dark:bg-slate-900/90 rounded-xl p-2.5 px-3.5 border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center justify-between">
                 <div>
-                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Sistemas Activos</span>
-                    <span class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1 block" x-text="activeCount()"></span>
-                    <span class="text-[10px] text-emerald-600 dark:text-emerald-500/80 flex items-center gap-1">
+                    <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Sistemas Activos</span>
+                    <span class="text-lg font-black text-emerald-600 dark:text-emerald-400 block leading-tight" x-text="activeCount()"></span>
+                    <span class="text-[9px] text-emerald-600 dark:text-emerald-500/80 flex items-center gap-1">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
                         <span>Operando en vivo</span>
                     </span>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm border border-emerald-500/20">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <div class="bg-white dark:bg-slate-900/90 rounded-xl p-2.5 px-3.5 border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center justify-between">
                 <div>
-                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Redes LAN / Farmacias</span>
-                    <span class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1 block" x-text="uniqueClients()"></span>
-                    <span class="text-[10px] text-slate-400 dark:text-slate-500">Farmacias conectadas</span>
+                    <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Redes LAN</span>
+                    <span class="text-lg font-black text-indigo-600 dark:text-indigo-400 block leading-tight" x-text="uniqueClients()"></span>
+                    <span class="text-[9px] text-slate-400">Farmacias conectadas</span>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl border border-indigo-500/20">
+                <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-sm border border-indigo-500/20">
                     <i class="fa-solid fa-network-wired"></i>
                 </div>
             </div>
 
-            <div class="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+            <div class="bg-white dark:bg-slate-900/90 rounded-xl p-2.5 px-3.5 border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center justify-between">
                 <div>
-                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Licencias Revocadas</span>
-                    <span class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1 block" x-text="revokedCount()"></span>
-                    <span class="text-[10px] text-slate-400 dark:text-slate-500">Bloqueadas remotamente</span>
+                    <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Revocadas (Bloqueadas)</span>
+                    <span class="text-lg font-black text-rose-600 dark:text-rose-400 block leading-tight" x-text="revokedCount()"></span>
+                    <span class="text-[9px] text-slate-400">Bloqueo remoto cloud</span>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl border border-rose-500/20">
+                <div class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-sm border border-rose-500/20">
                     <i class="fa-solid fa-ban"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Filter & Search Panel -->
-        <div class="bg-white dark:bg-slate-900/90 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="relative w-full sm:w-96">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+        <!-- Filter & Search Panel (Compacto) -->
+        <div class="bg-white dark:bg-slate-900/90 rounded-xl p-2 px-3 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div class="relative w-full sm:w-80">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                 <input type="text" x-model="searchQuery"
-                    placeholder="Buscar por cliente, HWID, sistema, rol o LAN..."
-                    class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500">
+                    placeholder="Buscar cliente, HWID, sistema, rol..."
+                    class="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500">
             </div>
 
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <span class="text-xs text-slate-500 dark:text-slate-400 font-bold hidden sm:inline">Filtro:</span>
-                <div class="inline-flex rounded-xl bg-slate-100 dark:bg-slate-950 p-1 border border-slate-200 dark:border-slate-800 w-full sm:w-auto">
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 font-bold hidden sm:inline">Filtro:</span>
+                <div class="inline-flex rounded-lg bg-slate-100 dark:bg-slate-950 p-0.5 border border-slate-200 dark:border-slate-800">
                     <button type="button" @click="filterStatus = 'todos'"
-                        :class="filterStatus === 'todos' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
-                        class="px-3 py-1 rounded-lg text-xs font-bold transition flex-1 sm:flex-initial">
+                        :class="filterStatus === 'todos' ? 'bg-emerald-600 text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                        class="px-2.5 py-1 rounded-md text-[11px] font-bold transition">
                         Todos (<span x-text="licenses.length"></span>)
                     </button>
                     <button type="button" @click="filterStatus = 'activa'"
-                        :class="filterStatus === 'activa' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
-                        class="px-3 py-1 rounded-lg text-xs font-bold transition flex-1 sm:flex-initial">
+                        :class="filterStatus === 'activa' ? 'bg-emerald-600 text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                        class="px-2.5 py-1 rounded-md text-[11px] font-bold transition">
                         Activas (<span x-text="activeCount()"></span>)
                     </button>
                     <button type="button" @click="filterStatus = 'revocada'"
-                        :class="filterStatus === 'revocada' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
-                        class="px-3 py-1 rounded-lg text-xs font-bold transition flex-1 sm:flex-initial">
+                        :class="filterStatus === 'revocada' ? 'bg-rose-600 text-white shadow-2xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                        class="px-2.5 py-1 rounded-md text-[11px] font-bold transition">
                         Revocadas (<span x-text="revokedCount()"></span>)
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Master Licenses Table -->
-        <div class="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xl">
-            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/50">
+        <!-- Master Licenses Table (100% Ajustada a Pantalla - Sin Scroll Horizontal) -->
+        <div class="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+            <div class="px-3.5 py-2 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/50">
                 <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-emerald-600 dark:text-emerald-400"></i>
-                    <h2 class="font-heading font-black text-sm text-slate-900 dark:text-white">Sistemas & Terminales Autorizadas</h2>
+                    <i class="fa-solid fa-list-check text-emerald-600 dark:text-emerald-400 text-xs"></i>
+                    <h2 class="font-heading font-black text-xs text-slate-900 dark:text-white">Sistemas & Terminales Autorizadas</h2>
                 </div>
-                <span class="text-xs text-slate-500 dark:text-slate-400 font-mono" x-text="filteredLicenses().length + ' de ' + licenses.length + ' licencias'"></span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 font-mono" x-text="filteredLicenses().length + ' de ' + licenses.length + ' licencias'"></span>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-slate-50 dark:bg-slate-950/80 text-slate-600 dark:text-slate-400 uppercase font-mono tracking-wider border-b border-slate-200 dark:border-slate-800">
+            <div>
+                <table class="w-full text-left text-xs table-fixed">
+                    <thead class="bg-slate-50 dark:bg-slate-950/80 text-slate-500 dark:text-slate-400 uppercase font-mono text-[10px] tracking-wider border-b border-slate-200 dark:border-slate-800">
                         <tr>
-                            <th class="py-3.5 px-5 min-w-[320px]">Sistema & Estación / Empresa</th>
-                            <th class="py-3.5 px-5 text-center whitespace-nowrap">Tipo de Equipo</th>
-                            <th class="py-3.5 px-5 whitespace-nowrap">Identificador de Equipo (HWID)</th>
-                            <th class="py-3.5 px-5 text-center whitespace-nowrap">Estado Remoto</th>
-                            <th class="py-3.5 px-5 whitespace-nowrap">Red & Conexión (IP Pública / LAN)</th>
-                            <th class="py-3.5 px-5 text-center whitespace-nowrap">Acciones</th>
+                            <th class="py-2 px-3 w-[35%]">Estación / Sistema</th>
+                            <th class="py-2 px-3 w-[22%]">Identificador (HWID)</th>
+                            <th class="py-2 px-3 w-[17%]">Red (LAN / WAN)</th>
+                            <th class="py-2 px-3 w-[13%] text-center">Estado Remoto</th>
+                            <th class="py-2 px-3 w-[13%] text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
                         <template x-for="item in filteredLicenses()" :key="item.id">
-                            <tr :class="item.tipo_nodo === 'cliente' ? 'bg-slate-50/60 dark:bg-slate-950/40 border-l-4 border-l-blue-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'" class="transition">
-                                <!-- Sistema / Empresa & Estación -->
-                                <td class="py-4 px-5">
-                                    <!-- Si es Servidor Principal -->
+                            <tr :class="item.tipo_nodo === 'cliente' ? 'bg-slate-50/40 dark:bg-slate-950/30' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'" class="transition">
+                                <!-- Estación / Sistema -->
+                                <td class="py-2 px-3">
                                     <template x-if="item.tipo_nodo !== 'cliente'">
-                                        <div class="flex items-start gap-3">
-                                            <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm border border-emerald-500/20 shrink-0 mt-0.5">
-                                                <i class="fa-solid fa-server"></i>
-                                            </div>
-                                            <div>
-                                                <div class="font-black text-sm text-slate-900 dark:text-white" x-text="item.cliente"></div>
-                                                <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5" x-text="item.sistema"></div>
-                                                <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5 whitespace-nowrap">
-                                                    <span class="font-mono text-slate-400">ID: <span class="font-bold text-slate-600 dark:text-slate-300" x-text="item.id"></span></span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 shrink-0">SERVIDOR</span>
+                                            <div class="min-w-0 truncate">
+                                                <div class="font-bold text-xs text-slate-900 dark:text-white truncate" x-text="item.cliente"></div>
+                                                <div class="text-[10px] text-slate-400 truncate">
+                                                    <span class="text-emerald-600 dark:text-emerald-400 font-semibold" x-text="item.sistema"></span>
                                                     <span>&bull;</span>
-                                                    <span x-text="item.ciudad || 'Bolivia'"></span>
-                                                    <span>&bull;</span>
-                                                    <span class="font-mono text-emerald-600 dark:text-emerald-400" x-text="item.contacto"></span>
+                                                    <span class="font-mono text-slate-400" x-text="item.id"></span>
                                                 </div>
                                             </div>
                                         </div>
                                     </template>
-
-                                    <!-- Si es Terminal Cliente (Anidado con tab visual) -->
                                     <template x-if="item.tipo_nodo === 'cliente'">
-                                        <div class="pl-6 sm:pl-8 flex items-start gap-3">
-                                            <span class="text-blue-500 dark:text-blue-400 font-mono text-xl font-black select-none leading-none mt-1">└──</span>
-                                            <div class="min-w-0">
-                                                <div class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2 whitespace-nowrap">
-                                                    <i class="fa-solid fa-laptop text-blue-500 text-xs"></i>
-                                                    <span x-text="item.rol || 'Terminal Mostrador / Caja 2'"></span>
-                                                </div>
-                                                <div class="text-[11px] text-slate-400 flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
-                                                    <span class="font-mono text-blue-600 dark:text-blue-400 font-bold whitespace-nowrap" x-text="item.id"></span>
+                                        <div class="pl-2 sm:pl-3 flex items-center gap-2">
+                                            <span class="text-blue-500 font-mono text-xs font-black select-none leading-none">└─</span>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30 shrink-0">CLIENTE</span>
+                                            <div class="min-w-0 truncate">
+                                                <div class="font-bold text-xs text-slate-800 dark:text-slate-100 truncate" x-text="item.rol || 'Terminal Mostrador'"></div>
+                                                <div class="text-[10px] text-slate-400 truncate">
+                                                    <span>Sub: <strong class="text-slate-600 dark:text-slate-300 font-semibold" x-text="item.cliente"></strong></span>
                                                     <span>&bull;</span>
-                                                    <span class="whitespace-nowrap">Subordinado a: <strong class="text-slate-700 dark:text-slate-300 font-semibold" x-text="item.cliente"></strong></span>
-                                                    <span>&bull;</span>
-                                                    <span class="font-mono text-slate-400 whitespace-nowrap" x-text="item.contacto"></span>
+                                                    <span class="font-mono text-blue-500" x-text="item.id"></span>
                                                 </div>
                                             </div>
                                         </div>
                                     </template>
                                 </td>
 
-                                <!-- Tipo de Equipo (Servidor vs Cliente) -->
-                                <td class="py-4 px-5 text-center whitespace-nowrap">
-                                    <template x-if="item.tipo_nodo !== 'cliente'">
-                                        <div>
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
-                                                <i class="fa-solid fa-server text-[11px]"></i> SERVIDOR
-                                            </span>
-                                            <div class="text-[10px] text-slate-400 font-mono mt-1">Nodo Central / Base de Datos</div>
-                                        </div>
-                                    </template>
-                                    <template x-if="item.tipo_nodo === 'cliente'">
-                                        <div>
-                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30 uppercase tracking-wider">
-                                                <i class="fa-solid fa-desktop text-[11px]"></i> CLIENTE
-                                            </span>
-                                            <div class="text-[10px] text-slate-400 font-mono mt-1">Terminal de Atención LAN</div>
-                                        </div>
-                                    </template>
-                                </td>
-
-                                <!-- HWID -->
-                                <td class="py-4 px-5 font-mono text-xs whitespace-nowrap">
-                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-emerald-700 dark:text-emerald-400 font-bold">
-                                        <i class="fa-solid fa-microchip text-[10px] text-slate-400 dark:text-slate-500"></i>
+                                <!-- Identificador HWID con botón de copiado integrado -->
+                                <td class="py-2 px-3">
+                                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-emerald-700 dark:text-emerald-400 font-mono text-[11px] font-bold">
                                         <span x-text="item.hwid"></span>
+                                        <button type="button" @click="copyHwid(item.hwid)" title="Copiar HWID" class="text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 cursor-pointer ml-0.5">
+                                            <i class="fa-solid fa-copy text-[10px]"></i>
+                                        </button>
                                     </div>
                                 </td>
 
-                                <!-- Estado Remoto -->
-                                <td class="py-4 px-5 text-center whitespace-nowrap">
-                                    <template x-if="item.estado === 'activa'">
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                            <span>ACTIVA (HABILITADO)</span>
-                                        </span>
-                                    </template>
-                                    <template x-if="item.estado === 'revocada'">
-                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 animate-pulse">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                            <span>REVOCADA (BLOQUEADO)</span>
-                                        </span>
-                                    </template>
-                                </td>
-
-                                <!-- Red & Conexión (IP Pública / LAN) -->
-                                <td class="py-4 px-5 whitespace-nowrap">
-                                    <div class="flex items-center gap-1.5 mb-1.5">
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[10px] font-bold">
-                                            <i class="fa-solid fa-network-wired text-blue-500"></i>
-                                            <span x-text="item.lan_grupo || 'LAN'"></span>
-                                        </span>
+                                <!-- Red (LAN / WAN) -->
+                                <td class="py-2 px-3">
+                                    <div class="text-[11px] font-mono text-slate-700 dark:text-slate-300 flex items-center gap-1 truncate">
+                                        <i class="fa-solid fa-house-laptop text-blue-400 text-[9px]"></i>
+                                        <span x-text="item.ip_local || item.ip || '192.168.100.5'"></span>
                                     </div>
-                                    <!-- IP Pública WAN -->
                                     <template x-if="item.ip_publica">
-                                        <div class="text-[11px] font-mono font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-                                            <i class="fa-solid fa-globe text-emerald-500 text-[10px]"></i>
+                                        <div class="text-[9px] font-mono text-slate-400 flex items-center gap-1 truncate mt-0.5">
+                                            <i class="fa-solid fa-globe text-emerald-500 text-[8px]"></i>
                                             <span x-text="item.ip_publica"></span>
                                         </div>
                                     </template>
-                                    <!-- IP Local LAN -->
-                                    <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
-                                        <i class="fa-solid fa-house-laptop text-blue-400 text-[9px]"></i>
-                                        <span>LAN:</span>
-                                        <span x-text="item.ip_local || item.ip || '192.168.100.5'"></span>
-                                    </div>
-                                    <div class="text-[9px] text-slate-400 font-mono mt-0.5" x-text="item.ultimo_checkin || 'En línea'"></div>
+                                </td>
+
+                                <!-- Estado Remoto -->
+                                <td class="py-2 px-3 text-center">
+                                    <template x-if="item.estado === 'activa'">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                            <span>ACTIVA</span>
+                                        </span>
+                                    </template>
+                                    <template x-if="item.estado === 'revocada'">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 animate-pulse">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                            <span>BLOQUEADA</span>
+                                        </span>
+                                    </template>
                                 </td>
 
                                 <!-- Acciones (Bloqueo / Eliminación) -->
-                                <td class="py-4 px-5 text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <button type="button" @click="copyHwid(item.hwid)" title="Copiar HWID"
-                                            class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer">
-                                            <i class="fa-solid fa-copy text-xs"></i>
-                                        </button>
-
+                                <td class="py-2 px-3 text-center">
+                                    <div class="flex items-center justify-center gap-1.5">
                                         <!-- Bloquear / Reactivar -->
                                         <button type="button" @click="toggleStatus(item)"
                                             :disabled="isSyncingGithub"
                                             :class="item.estado === 'activa' ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30'"
-                                            class="px-3 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                            class="px-2.5 py-1 rounded-lg font-bold text-[11px] transition flex items-center gap-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                                             <i class="fa-solid" :class="isSyncingGithub ? 'fa-spinner fa-spin' : (item.estado === 'activa' ? 'fa-ban' : 'fa-check')"></i>
-                                            <span x-text="isSyncingGithub ? 'Guardando...' : (item.estado === 'activa' ? 'Bloquear' : 'Reactivar')"></span>
+                                            <span x-text="isSyncingGithub ? '...' : (item.estado === 'activa' ? 'Bloquear' : 'Reactivar')"></span>
                                         </button>
 
                                         <!-- Eliminar -->
                                         <button type="button" @click="deleteLicense(item.id)" title="Eliminar definitivamente"
                                             :disabled="isSyncingGithub"
-                                            class="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                                            <i class="fa-solid fa-trash-can text-xs"></i>
+                                            class="p-1 rounded-lg bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <i class="fa-solid fa-trash-can text-[11px]"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -363,48 +317,15 @@
             </div>
         </div>
 
-        <!-- Info Box: ¿Cómo funciona el kill-switch en vivo? -->
-        <div class="bg-white dark:bg-slate-900/90 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm border border-emerald-500/20">
-                    <i class="fa-solid fa-bolt"></i>
-                </div>
-                <div>
-                    <h3 class="font-heading font-black text-sm text-slate-900 dark:text-white">¿Cómo funciona el bloqueo remoto de sistemas y terminales LAN?</h3>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400">Si un cliente no paga, se atrasa en su cuota o cancela el servicio, el sistema o terminal se apaga remotamente.</p>
-                </div>
+        <!-- Info Box (Ultra-Compacto en 1 fila) -->
+        <div class="bg-white dark:bg-slate-900/90 rounded-xl p-2.5 px-3.5 border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-2 text-[11px]">
+            <div class="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                <i class="fa-solid fa-bolt text-emerald-600 dark:text-emerald-400"></i>
+                <span class="font-bold">Kill-Switch Cloud Activo:</span>
+                <span class="text-slate-500 dark:text-slate-400">Al pulsar "Bloquear" o "Reactivar", el software del cliente detecta el cambio en vivo vía GitHub.</span>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
-                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1">
-                    <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-black">1</span>
-                        <span>Haz clic en "Bloquear" o "Eliminar":</span>
-                    </div>
-                    <p class="text-slate-500 dark:text-slate-400 text-[11px] pl-7 leading-relaxed">
-                        En este panel cambia el estado a <strong class="text-rose-600 dark:text-rose-400">REVOCADA</strong> o elimínalo con el basurero.
-                    </p>
-                </div>
-
-                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1">
-                    <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-black">2</span>
-                        <span>Sincronización en la Nube:</span>
-                    </div>
-                    <p class="text-slate-500 dark:text-slate-400 text-[11px] pl-7 leading-relaxed">
-                        Con el botón <strong class="text-emerald-600 dark:text-emerald-400">GitHub Conectado</strong>, el guardado es instantáneo en 1 segundo vía API sin descargar nada.
-                    </p>
-                </div>
-
-                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1">
-                    <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-black">3</span>
-                        <span>El sistema del cliente se bloquea:</span>
-                    </div>
-                    <p class="text-slate-500 dark:text-slate-400 text-[11px] pl-7 leading-relaxed">
-                        En cuanto la computadora del cliente detecta el cambio por internet, elimina su clave local y <strong class="text-rose-600 dark:text-rose-400">se bloquea de inmediato</strong>.
-                    </p>
-                </div>
+            <div class="text-[10px] text-slate-400 font-mono">
+                Sincronización directa con tu repositorio en la nube
             </div>
         </div>
 
@@ -460,7 +381,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nombre del Software</label>
-                        <input type="text" x-model="newForm.sistema" placeholder="Ej: Farmacia Compostela POS v2.0 o Lavado de Autos Express v1.0" required
+                        <input type="text" x-model="newForm.sistema" placeholder="Ej: Farmacia Compostela v2.0 o Lavado de Autos Express v1.0" required
                             class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
                     </div>
                 </div>
@@ -639,7 +560,7 @@
                     {
                         id: 'LIC-2026-001',
                         cliente: 'Farmacia Compostela',
-                        sistema: 'Farmacia Compostela POS v2.0',
+                        sistema: 'Farmacia Compostela v2.0',
                         tipo_nodo: 'servidor',
                         rol: 'Caja Central / Servidor Principal',
                         lan_grupo: 'LAN-COMPOSTELA',
@@ -659,7 +580,7 @@
                     {
                         id: 'LIC-2026-002',
                         cliente: 'Farmacia Compostela',
-                        sistema: 'Farmacia Compostela POS v2.0',
+                        sistema: 'Farmacia Compostela v2.0',
                         tipo_nodo: 'cliente',
                         parent_id: 'LIC-2026-001',
                         rol: 'Terminal de Mostrador / Caja 2',
@@ -698,7 +619,7 @@
                     tipo_nodo: 'cliente',
                     parent_id: '',
                     cliente: 'Farmacia Compostela',
-                    sistema: 'Farmacia Compostela POS v2.0',
+                    sistema: 'Farmacia Compostela v2.0',
                     rol: 'Terminal Mostrador / Caja 2',
                     lan_grupo: 'LAN-COMPOSTELA',
                     hwid: '',
@@ -1053,7 +974,7 @@
                     let newEntry = {
                         id: nextId,
                         cliente: this.newForm.cliente,
-                        sistema: this.newForm.sistema || 'Farmacia Compostela POS v2.0',
+                        sistema: this.newForm.sistema || 'Farmacia Compostela v2.0',
                         tipo_nodo: this.newForm.tipo_nodo || 'cliente',
                         parent_id: this.newForm.parent_id || '',
                         rol: this.newForm.rol || (this.newForm.tipo_nodo === 'servidor' ? 'Caja Central / Servidor Principal' : 'Terminal Mostrador / Caja 2'),
@@ -1081,7 +1002,7 @@
                         tipo_nodo: 'cliente',
                         parent_id: '',
                         cliente: 'Farmacia Compostela',
-                        sistema: 'Farmacia Compostela POS v2.0',
+                        sistema: 'Farmacia Compostela v2.0',
                         rol: 'Terminal Mostrador / Caja 2',
                         lan_grupo: 'LAN-COMPOSTELA',
                         hwid: '',
