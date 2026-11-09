@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro Global de Licencias | Panel Maestro de Control</title>
+    
+    <!-- Theme Initializer -->
+    <script>
+        if (localStorage.getItem('compostela_panel_theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.2s ease, color 0.2s ease; }
+        .font-heading { font-family: 'Outfit', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen antialiased selection:bg-emerald-500 selection:text-white"
+      x-data="licenseApp()" x-init="initApp()">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white text-lg shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h1 class="font-heading font-black text-lg tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>CONTROL GLOBAL DE LICENCIAS</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">GITHUB CLOUD</span>
+                    </h1>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">Monitor en Vivo & Kill-Switch Remoto</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- Theme Toggle Button (Modo Claro / Modo Oscuro) -->
+                <button type="button" @click="toggleTheme()" :title="isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'"
+                    class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-xs">
+                    <i class="fa-solid text-sm" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-500'"></i>
+                    <span class="hidden sm:inline" x-text="isDark ? 'Modo Claro' : 'Modo Oscuro'"></span>
+                </button>
+
+                <!-- GitHub Cloud Direct Sync Button -->
+                <button type="button" @click="showGithubModal = true"
+                    :class="githubConfig.token ? 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-500/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'"
+                    class="px-3 py-2 rounded-xl text-xs font-bold border transition flex items-center gap-2 cursor-pointer shadow-xs">
+                    <span class="relative flex h-2 w-2" x-show="githubConfig.token">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <i class="fa-brands fa-github text-sm" :class="githubConfig.token ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'"></i>
+                    <span class="hidden md:inline" x-text="githubConfig.token ? 'GitHub Conectado' : 'Conectar GitHub'"></span>
+                    <i x-show="isSyncingGithub" class="fa-solid fa-spinner fa-spin text-emerald-500 text-xs"></i>
+                </button>
+
+                <!-- Nueva Licencia -->
+                <button type="button" @click="showNewModal = true"
+                    class="px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/30 transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Nueva Licencia</span>
+                </button>
+
+                <!-- Guardar JSON -->
+                <button type="button" @click="exportJson()" title="Descargar licenses.json para subir a GitHub"
+                    class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-xs">
+                    <i class="fa-solid fa-cloud-arrow-down text-emerald-600 dark:text-emerald-400"></i>
+                    <span class="hidden lg:inline">Guardar JSON</span>
+                </button>
+
+                <!-- Excel / CSV -->
+                <button type="button" @click="exportCsv()" title="Exportar a Planilla Excel / CSV"
+                    class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-xs">
+                    <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400"></i>
+                    <span class="hidden lg:inline">Excel</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- KPI Metrics Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Total Licencias</span>
+                    <span class="text-2xl font-black text-slate-900 dark:text-white mt-1 block" x-text="licenses.length"></span>
+                    <span class="text-[10px] text-slate-400 dark:text-slate-500">Sistemas bajo control</span>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl border border-blue-500/20">
+                    <i class="fa-solid fa-id-badge"></i>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Sistemas Activos</span>
+                    <span class="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1 block" x-text="activeCount()"></span>
+                    <span class="text-[10px] text-emerald-600 dark:text-emerald-500/80 flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+                        <span>Operando en vivo</span>
+                    </span>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Redes LAN / Farmacias</span>
+                    <span class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1 block" x-text="uniqueClients()"></span>
+                    <span class="text-[10px] text-slate-400 dark:text-slate-500">Farmacias conectadas</span>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl border border-indigo-500/20">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-900/90 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Licencias Revocadas</span>
+                    <span class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1 block" x-text="revokedCount()"></span>
+                    <span class="text-[10px] text-slate-400 dark:text-slate-500">Bloqueadas remotamente</span>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xl border border-rose-500/20">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Panel -->
+        <div class="bg-white dark:bg-slate-900/90 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="relative w-full sm:w-96">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                <input type="text" x-model="searchQuery"
+                    placeholder="Buscar por cliente, HWID, sistema, rol o LAN..."
+                    class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500">
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-bold hidden sm:inline">Filtro:</span>
+                <div class="inline-flex rounded-xl bg-slate-100 dark:bg-slate-950 p-1 border border-slate-200 dark:border-slate-800 w-full sm:w-auto">
+                    <button type="button" @click="filterStatus = 'todos'"
+                        :class="filterStatus === 'todos' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                        class="px-3 py-1 rounded-lg text-xs font-bold transition flex-1 sm:flex-initial">
+                        Todos (<span x-text="licenses.length"></span>)
+                    </button>
+                    <button type="button" @click="filterStatus = 'activa'"
+                        :class="filterStatus === 'activa' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                        class="px-3 py-1 rounded-lg text-xs font-bold transition flex-1 sm:flex-initial">
+                        Activas (<span x-text="activeCount()"></span>)
+                    </button>
+                    <button type="button" @click="filterStatus = 'revocada'"
+                        :class="filterStatus === 'revocada' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'"
+                        class="px-3 py-1 rounded-lg text-xs font-bold transition flex-1 sm:flex-initial">
+                        Revocadas (<span x-text="revokedCount()"></span>)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Master Licenses Table -->
+        <div class="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xl">
+            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/50">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-emerald-600 dark:text-emerald-400"></i>
+                    <h2 class="font-heading font-black text-sm text-slate-900 dark:text-white">Sistemas & Terminales Autorizadas</h2>
+                </div>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-mono" x-text="filteredLicenses().length + ' de ' + licenses.length + ' licencias'"></span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-50 dark:bg-slate-950/80 text-slate-600 dark:text-slate-400 uppercase font-mono tracking-wider border-b border-slate-200 dark:border-slate-800">
+                        <tr>
+                            <th class="py-3.5 px-5 min-w-[320px]">Sistema & Estación / Empresa</th>
+                            <th class="py-3.5 px-5 text-center whitespace-nowrap">Tipo de Equipo</th>
+                            <th class="py-3.5 px-5 whitespace-nowrap">Identificador de Equipo (HWID)</th>
+                            <th class="py-3.5 px-5 text-center whitespace-nowrap">Estado Remoto</th>
+                            <th class="py-3.5 px-5 whitespace-nowrap">Red & Conexión (IP Pública / LAN)</th>
+                            <th class="py-3.5 px-5 text-center whitespace-nowrap">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+                        <template x-for="item in filteredLicenses()" :key="item.id">
+                            <tr :class="item.tipo_nodo === 'cliente' ? 'bg-slate-50/60 dark:bg-slate-950/40 border-l-4 border-l-blue-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'" class="transition">
+                                <!-- Sistema / Empresa & Estación -->
+                                <td class="py-4 px-5">
+                                    <!-- Si es Servidor Principal -->
+                                    <template x-if="item.tipo_nodo !== 'cliente'">
+                                        <div class="flex items-start gap-3">
+                                            <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm border border-emerald-500/20 shrink-0 mt-0.5">
+                                                <i class="fa-solid fa-server"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-black text-sm text-slate-900 dark:text-white" x-text="item.cliente"></div>
+                                                <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-0.5" x-text="item.sistema"></div>
+                                                <div class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5 whitespace-nowrap">
+                                                    <span class="font-mono text-slate-400">ID: <span class="font-bold text-slate-600 dark:text-slate-300" x-text="item.id"></span></span>
+                                                    <span>&bull;</span>
+                                                    <span x-text="item.ciudad || 'Bolivia'"></span>
+                                                    <span>&bull;</span>
+                                                    <span class="font-mono text-emerald-600 dark:text-emerald-400" x-text="item.contacto"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+
+                                    <!-- Si es Terminal Cliente (Anidado con tab visual) -->
+                                    <template x-if="item.tipo_nodo === 'cliente'">
+                                        <div class="pl-6 sm:pl-8 flex items-start gap-3">
+                                            <span class="text-blue-500 dark:text-blue-400 font-mono text-xl font-black select-none leading-none mt-1">└──</span>
+                                            <div class="min-w-0">
+                                                <div class="font-bold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2 whitespace-nowrap">
+                                                    <i class="fa-solid fa-laptop text-blue-500 text-xs"></i>
+                                                    <span x-text="item.rol || 'Terminal Mostrador / Caja 2'"></span>
+                                                </div>
+                                                <div class="text-[11px] text-slate-400 flex items-center flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
+                                                    <span class="font-mono text-blue-600 dark:text-blue-400 font-bold whitespace-nowrap" x-text="item.id"></span>
+                                                    <span>&bull;</span>
+                                                    <span class="whitespace-nowrap">Subordinado a: <strong class="text-slate-700 dark:text-slate-300 font-semibold" x-text="item.cliente"></strong></span>
+                                                    <span>&bull;</span>
+                                                    <span class="font-mono text-slate-400 whitespace-nowrap" x-text="item.contacto"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </td>
+
+                                <!-- Tipo de Equipo (Servidor vs Cliente) -->
+                                <td class="py-4 px-5 text-center whitespace-nowrap">
+                                    <template x-if="item.tipo_nodo !== 'cliente'">
+                                        <div>
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
+                                                <i class="fa-solid fa-server text-[11px]"></i> SERVIDOR
+                                            </span>
+                                            <div class="text-[10px] text-slate-400 font-mono mt-1">Nodo Central / Base de Datos</div>
+                                        </div>
+                                    </template>
+                                    <template x-if="item.tipo_nodo === 'cliente'">
+                                        <div>
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/30 uppercase tracking-wider">
+                                                <i class="fa-solid fa-desktop text-[11px]"></i> CLIENTE
+                                            </span>
+                                            <div class="text-[10px] text-slate-400 font-mono mt-1">Terminal de Atención LAN</div>
+                                        </div>
+                                    </template>
+                                </td>
+
+                                <!-- HWID -->
+                                <td class="py-4 px-5 font-mono text-xs whitespace-nowrap">
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-emerald-700 dark:text-emerald-400 font-bold">
+                                        <i class="fa-solid fa-microchip text-[10px] text-slate-400 dark:text-slate-500"></i>
+                                        <span x-text="item.hwid"></span>
+                                    </div>
+                                </td>
+
+                                <!-- Estado Remoto -->
+                                <td class="py-4 px-5 text-center whitespace-nowrap">
+                                    <template x-if="item.estado === 'activa'">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                            <span>ACTIVA (HABILITADO)</span>
+                                        </span>
+                                    </template>
+                                    <template x-if="item.estado === 'revocada'">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 animate-pulse">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                            <span>REVOCADA (BLOQUEADO)</span>
+                                        </span>
+                                    </template>
+                                </td>
+
+                                <!-- Red & Conexión (IP Pública / LAN) -->
+                                <td class="py-4 px-5 whitespace-nowrap">
+                                    <div class="flex items-center gap-1.5 mb-1.5">
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 text-[10px] font-bold">
+                                            <i class="fa-solid fa-network-wired text-blue-500"></i>
+                                            <span x-text="item.lan_grupo || 'LAN'"></span>
+                                        </span>
+                                    </div>
+                                    <!-- IP Pública WAN -->
+                                    <template x-if="item.ip_publica">
+                                        <div class="text-[11px] font-mono font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-globe text-emerald-500 text-[10px]"></i>
+                                            <span x-text="item.ip_publica"></span>
+                                        </div>
+                                    </template>
+                                    <!-- IP Local LAN -->
+                                    <div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1.5 mt-0.5">
+                                        <i class="fa-solid fa-house-laptop text-blue-400 text-[9px]"></i>
+                                        <span>LAN:</span>
+                                        <span x-text="item.ip_local || item.ip || '192.168.100.5'"></span>
+                                    </div>
+                                    <div class="text-[9px] text-slate-400 font-mono mt-0.5" x-text="item.ultimo_checkin || 'En línea'"></div>
+                                </td>
+
+                                <!-- Acciones (Bloqueo / Eliminación) -->
+                                <td class="py-4 px-5 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button type="button" @click="copyHwid(item.hwid)" title="Copiar HWID"
+                                            class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer">
+                                            <i class="fa-solid fa-copy text-xs"></i>
+                                        </button>
+
+                                        <!-- Bloquear / Reactivar -->
+                                        <button type="button" @click="toggleStatus(item)"
+                                            :class="item.estado === 'activa' ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30'"
+                                            class="px-3 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5 cursor-pointer">
+                                            <i class="fa-solid" :class="item.estado === 'activa' ? 'fa-ban' : 'fa-check'"></i>
+                                            <span x-text="item.estado === 'activa' ? 'Bloquear' : 'Reactivar'"></span>
+                                        </button>
+
+                                        <!-- Eliminar -->
+                                        <button type="button" @click="deleteLicense(item.id)" title="Eliminar definitivamente"
+                                            class="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer">
+                                            <i class="fa-solid fa-trash-can text-xs"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Info Box: ¿Cómo funciona el kill-switch en vivo? -->
+        <div class="bg-white dark:bg-slate-900/90 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm border border-emerald-500/20">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <h3 class="font-heading font-black text-sm text-slate-900 dark:text-white">¿Cómo funciona el bloqueo remoto de sistemas y terminales LAN?</h3>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">Si un cliente no paga, se atrasa en su cuota o cancela el servicio, el sistema o terminal se apaga remotamente.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1">
+                    <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-black">1</span>
+                        <span>Haz clic en "Bloquear" o "Eliminar":</span>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 text-[11px] pl-7 leading-relaxed">
+                        En este panel cambia el estado a <strong class="text-rose-600 dark:text-rose-400">REVOCADA</strong> o elimínalo con el basurero.
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1">
+                    <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-black">2</span>
+                        <span>Sincronización en la Nube:</span>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 text-[11px] pl-7 leading-relaxed">
+                        Con el botón <strong class="text-emerald-600 dark:text-emerald-400">GitHub Conectado</strong>, el guardado es instantáneo en 1 segundo vía API sin descargar nada.
+                    </p>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1">
+                    <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-black">3</span>
+                        <span>El sistema del cliente se bloquea:</span>
+                    </div>
+                    <p class="text-slate-500 dark:text-slate-400 text-[11px] pl-7 leading-relaxed">
+                        En cuanto la computadora del cliente detecta el cambio por internet, elimina su clave local y <strong class="text-rose-600 dark:text-rose-400">se bloquea de inmediato</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal Registrar Nueva Licencia -->
+    <div x-show="showNewModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-xs">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5" @click.outside="showNewModal = false">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-heading font-black text-base text-slate-900 dark:text-white">Registrar Nueva Licencia / Terminal LAN</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Autorizar un nuevo servidor o terminal cliente en la nube</p>
+                    </div>
+                </div>
+                <button type="button" @click="showNewModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form @submit.prevent="saveNewLicense()" class="space-y-4">
+                <!-- Tipo de Nodo: Servidor o Cliente -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Tipo de Equipo</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label :class="newForm.tipo_nodo === 'servidor' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-200' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300'"
+                            class="p-3 rounded-xl border flex items-center gap-2 cursor-pointer transition">
+                            <input type="radio" value="servidor" x-model="newForm.tipo_nodo" class="text-emerald-600 focus:ring-emerald-500">
+                            <div>
+                                <div class="font-bold text-xs">🖥️ Servidor Central</div>
+                                <div class="text-[10px] text-slate-400">Sistema Principal / Base Datos</div>
+                            </div>
+                        </label>
+                        <label :class="newForm.tipo_nodo === 'cliente' ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300'"
+                            class="p-3 rounded-xl border flex items-center gap-2 cursor-pointer transition">
+                            <input type="radio" value="cliente" x-model="newForm.tipo_nodo" class="text-blue-600 focus:ring-blue-500">
+                            <div>
+                                <div class="font-bold text-xs">💻 Terminal Cliente</div>
+                                <div class="text-[10px] text-slate-400">Caja LAN Subordinada</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Empresa / Negocio</label>
+                        <input type="text" x-model="newForm.cliente" placeholder="Ej: Farmacia Compostela o Lavado de Autos Express" required
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nombre del Software</label>
+                        <input type="text" x-model="newForm.sistema" placeholder="Ej: Farmacia Compostela POS v2.0 o Lavado de Autos Express v1.0" required
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Rol / Nombre de Estación</label>
+                        <input type="text" x-model="newForm.rol" placeholder="Ej: Terminal Mostrador / Caja 2 o Pista Entrada 1" required
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Grupo LAN (Misma Red)</label>
+                        <input type="text" x-model="newForm.lan_grupo" placeholder="Ej: LAN-COMPOSTELA o LAN-LAVADO" required
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Identificador de la Computadora (HWID)</label>
+                    <input type="text" x-model="newForm.hwid" placeholder="Ej: MATU-DD98-... o MATU-TERM-7B29-..." required
+                        class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Tipo de Licencia</label>
+                        <select x-model="newForm.tipo" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                            <option value="perpetua">Comercial Perpetua</option>
+                            <option value="anual">Suscripción Anual</option>
+                            <option value="mensual">Suscripción Mensual</option>
+                            <option value="demo">Demo (30 Días)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">IP Asignada (Red Local)</label>
+                        <input type="text" x-model="newForm.ip" placeholder="Ej: 192.168.100.x"
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Ciudad / Ubicación</label>
+                        <input type="text" x-model="newForm.ciudad" placeholder="Ej: Bolivia"
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Contacto / Teléfono</label>
+                        <input type="text" x-model="newForm.contacto" placeholder="Ej: +591 70471057"
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <div class="pt-3 flex items-center justify-end gap-3 border-t border-slate-200 dark:border-slate-800">
+                    <button type="button" @click="showNewModal = false" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/30 transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Guardar Licencia</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Conectar GitHub API (Auto-Sync en la Nube) -->
+    <div x-show="showGithubModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5" @click.outside="showGithubModal = false">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white flex items-center justify-center text-xl border border-slate-200 dark:border-slate-700 shadow-xs">
+                        <i class="fa-brands fa-github text-emerald-600 dark:text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-heading font-black text-base text-slate-900 dark:text-white">Sincronización Automática con GitHub</h3>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Guarda en tu repositorio en la nube en tiempo real sin descargar archivos</p>
+                    </div>
+                </div>
+                <button type="button" @click="showGithubModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Guía Rápida de 3 Pasos -->
+            <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800/80 space-y-2 text-[11px] text-slate-700 dark:text-slate-300">
+                <div class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>¿Cómo obtener tu Token de GitHub en 1 minuto?</span>
+                </div>
+                <ol class="list-decimal list-inside space-y-1 text-slate-500 dark:text-slate-400 leading-relaxed">
+                    <li>Entra en GitHub a <strong class="text-slate-900 dark:text-white">Settings</strong> &rarr; <strong class="text-slate-900 dark:text-white">Developer Settings</strong> &rarr; <strong class="text-slate-900 dark:text-white">Personal access tokens (Tokens classic)</strong>.</li>
+                    <li>Haz clic en <strong class="text-slate-900 dark:text-white">Generate new token</strong>, ponle un nombre (ej: <em>Panel Licencias</em>) y marca la casilla <strong class="text-emerald-600 dark:text-emerald-400">repo</strong>.</li>
+                    <li>Copia el token generado (<code class="text-emerald-600 dark:text-emerald-400 bg-slate-200 dark:bg-slate-900 px-1 py-0.5 rounded">ghp_...</code>) y pégalo abajo.</li>
+                </ol>
+            </div>
+
+            <form @submit.prevent="saveGithubConfig()" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Repositorio en GitHub (usuario/nombre-repositorio)</label>
+                    <input type="text" x-model="githubConfig.repo" placeholder="Ej: Watson/licencias-farmacia" required
+                        class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Rama / Branch</label>
+                        <input type="text" x-model="githubConfig.branch" placeholder="main" required
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Ruta del Archivo</label>
+                        <input type="text" x-model="githubConfig.path" placeholder="licenses.json" required
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">GitHub Personal Access Token (PAT)</label>
+                        <button type="button" @click="showTokenInput = !showTokenInput" class="text-[11px] text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400">
+                            <span x-text="showTokenInput ? 'Ocultar' : 'Mostrar'"></span>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <input :type="showTokenInput ? 'text' : 'password'" x-model="githubConfig.token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" required
+                            class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 font-mono">
+                    </div>
+                </div>
+
+                <!-- Test Result Feedback -->
+                <div x-show="githubTestStatus !== ''" class="p-3 rounded-xl text-xs flex items-center gap-2"
+                     :class="githubTestStatus === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/50 text-emerald-700 dark:text-emerald-300' : (githubTestStatus === 'testing' ? 'bg-blue-50 dark:bg-blue-950/60 border border-blue-500/50 text-blue-700 dark:text-blue-300' : 'bg-rose-50 dark:bg-rose-950/60 border border-rose-500/50 text-rose-700 dark:text-rose-300')">
+                    <i class="fa-solid" :class="githubTestStatus === 'success' ? 'fa-circle-check text-emerald-500' : (githubTestStatus === 'testing' ? 'fa-spinner fa-spin text-blue-500' : 'fa-circle-exclamation text-rose-500')"></i>
+                    <span x-text="githubTestMessage"></span>
+                </div>
+
+                <div class="pt-3 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
+                    <button type="button" x-show="githubConfig.token" @click="disconnectGithub()" class="text-xs text-rose-600 dark:text-rose-400 hover:underline cursor-pointer">
+                        Desconectar
+                    </button>
+                    <div class="flex items-center gap-2.5 ml-auto">
+                        <button type="button" @click="testGithubConnection()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-plug text-slate-400"></i>
+                            <span>Probar Conexión</span>
+                        </button>
+                        <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/30 transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Guardar y Conectar</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div x-show="toast.visible" x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 translate-y-2"
+         class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl bg-emerald-600 text-white font-bold text-xs shadow-xl flex items-center gap-2">
+        <i class="fa-solid fa-circle-check"></i>
+        <span x-text="toast.message"></span>
+    </div>
+
+    <script>
+        function licenseApp() {
+            return {
+                isDark: document.documentElement.classList.contains('dark'),
+                licenses: [
+                    {
+                        id: 'LIC-2026-001',
+                        cliente: 'Farmacia Compostela',
+                        sistema: 'Farmacia Compostela POS v2.0',
+                        tipo_nodo: 'servidor',
+                        rol: 'Caja Central / Servidor Principal',
+                        lan_grupo: 'LAN-COMPOSTELA',
+                        hwid: 'MATU-DD98-6E36-9FE6-A552',
+                        tipo: 'perpetua',
+                        estado: 'activa',
+                        terminales: 2,
+                        fecha_emision: '2026-11-08',
+                        ultimo_checkin: 'En línea',
+                        ip_publica: '181.115.171.116 (Bolivia)',
+                        ip_local: '192.168.100.5 (Servidor)',
+                        ip: '181.115.171.116',
+                        ciudad: 'Bolivia',
+                        contacto: '+591 70471057',
+                        notas: 'Servidor Central + Base de Datos'
+                    },
+                    {
+                        id: 'LIC-2026-002',
+                        cliente: 'Farmacia Compostela',
+                        sistema: 'Farmacia Compostela POS v2.0',
+                        tipo_nodo: 'cliente',
+                        parent_id: 'LIC-2026-001',
+                        rol: 'Terminal de Mostrador / Caja 2',
+                        lan_grupo: 'LAN-COMPOSTELA',
+                        hwid: 'MATU-TERM-7B29-41C8-9901',
+                        tipo: 'perpetua',
+                        estado: 'revocada',
+                        terminales: 1,
+                        fecha_emision: '2026-11-08',
+                        ultimo_checkin: 'En línea',
+                        ip_publica: '181.115.171.116 (Bolivia)',
+                        ip_local: '192.168.100.22 (Terminal Wi-Fi)',
+                        ip: '192.168.100.22',
+                        ciudad: 'Bolivia',
+                        contacto: '+591 70471057',
+                        notas: 'Punto de Venta Remoto (Misma LAN)'
+                    }
+                ],
+                searchQuery: '',
+                filterStatus: 'todos',
+                showNewModal: false,
+                showGithubModal: false,
+                showTokenInput: false,
+                isSyncingGithub: false,
+                githubTestStatus: '',
+                githubTestMessage: '',
+                githubFileSha: null,
+                toast: { visible: false, message: '' },
+                githubConfig: {
+                    repo: '',
+                    branch: 'main',
+                    path: 'licenses.json',
+                    token: ''
+                },
+                newForm: {
+                    tipo_nodo: 'cliente',
+                    parent_id: '',
+                    cliente: 'Farmacia Compostela',
+                    sistema: 'Farmacia Compostela POS v2.0',
+                    rol: 'Terminal Mostrador / Caja 2',
+                    lan_grupo: 'LAN-COMPOSTELA',
+                    hwid: '',
+                    tipo: 'perpetua',
+                    ip: '192.168.100.',
+                    ciudad: 'Bolivia',
+                    contacto: '+591 70471057'
+                },
+
+                toggleTheme() {
+                    this.isDark = !this.isDark;
+                    if (this.isDark) {
+                        document.documentElement.classList.add('dark');
+                        localStorage.setItem('compostela_panel_theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('compostela_panel_theme', 'light');
+                    }
+                },
+
+                async initApp() {
+                    // Cargar tema guardado
+                    let savedTheme = localStorage.getItem('compostela_panel_theme');
+                    if (savedTheme === 'light') {
+                        this.isDark = false;
+                        document.documentElement.classList.remove('dark');
+                    } else {
+                        this.isDark = true;
+                        document.documentElement.classList.add('dark');
+                    }
+
+                    // Cargar configuración guardada de GitHub si existe
+                    let savedGh = localStorage.getItem('compostela_github_config');
+                    if (savedGh) {
+                        try {
+                            this.githubConfig = Object.assign(this.githubConfig, JSON.parse(savedGh));
+                        } catch(e) {}
+                    }
+
+                    // 1. Sincronizar directo con GitHub API si el usuario ya configuró su token
+                    if (this.githubConfig.token && this.githubConfig.repo) {
+                        let ok = await this.fetchFromGithub();
+                        if (ok) return;
+                    }
+
+                    // 2. Sincronizar con el backend local si Farmacia Compostela está corriendo en localhost:8000
+                    try {
+                        let res = await fetch('http://localhost:8000/api/license-cloud/sync', { signal: AbortSignal.timeout(1500) });
+                        if (res.ok) {
+                            let serverData = await res.json();
+                            if (Array.isArray(serverData) && serverData.length > 0) {
+                                this.licenses = serverData;
+                                localStorage.setItem('compostela_licenses_cloud', JSON.stringify(serverData));
+                                return;
+                            }
+                        }
+                    } catch(e) {}
+
+                    // 3. Si hay datos en localStorage del navegador
+                    let local = localStorage.getItem('compostela_licenses_cloud');
+                    if (local) {
+                        try {
+                            let parsed = JSON.parse(local);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                this.licenses = parsed;
+                                return;
+                            }
+                        } catch(e) {}
+                    }
+
+                    // 4. Si está en servidor web o GitHub Pages (http/https)
+                    if (window.location.protocol.startsWith('http')) {
+                        try {
+                            let res = await fetch('licenses.json?t=' + Date.now(), { signal: AbortSignal.timeout(2000) });
+                            if (res.ok) {
+                                let remote = await res.json();
+                                if (Array.isArray(remote) && remote.length > 0) {
+                                    this.licenses = remote;
+                                    localStorage.setItem('compostela_licenses_cloud', JSON.stringify(remote));
+                                }
+                            }
+                        } catch(e) {}
+                    }
+                },
+
+                async testGithubConnection() {
+                    let repo = (this.githubConfig.repo || '').trim();
+                    let token = (this.githubConfig.token || '').trim();
+                    if (!repo || !token) {
+                        this.githubTestStatus = 'error';
+                        this.githubTestMessage = 'Por favor ingresa el repositorio y el token.';
+                        return;
+                    }
+
+                    this.githubTestStatus = 'testing';
+                    this.githubTestMessage = 'Verificando repositorio y permisos con GitHub...';
+
+                    try {
+                        let res = await fetch(`https://api.github.com/repos/${repo}`, {
+                            headers: {
+                                'Authorization': 'Bearer ' + token,
+                                'Accept': 'application/vnd.github+json'
+                            }
+                        });
+
+                        if (res.ok) {
+                            let repoData = await res.json();
+                            this.githubTestStatus = 'success';
+                            this.githubTestMessage = `¡Conectado con éxito a ${repoData.full_name}! Permisos de escritura verificados.`;
+                        } else if (res.status === 401) {
+                            this.githubTestStatus = 'error';
+                            this.githubTestMessage = 'Token inválido o expirado. Revisa haber copiado el código completo.';
+                        } else if (res.status === 404) {
+                            this.githubTestStatus = 'error';
+                            this.githubTestMessage = 'Repositorio no encontrado o el token no tiene permiso "repo".';
+                        } else {
+                            this.githubTestStatus = 'error';
+                            this.githubTestMessage = `Error de respuesta HTTP ${res.status}.`;
+                        }
+                    } catch(e) {
+                        this.githubTestStatus = 'error';
+                        this.githubTestMessage = 'Error de red al conectar con api.github.com.';
+                    }
+                },
+
+                async saveGithubConfig() {
+                    this.githubConfig.repo = this.githubConfig.repo.trim();
+                    this.githubConfig.branch = (this.githubConfig.branch || 'main').trim();
+                    this.githubConfig.path = (this.githubConfig.path || 'licenses.json').trim();
+                    this.githubConfig.token = this.githubConfig.token.trim();
+
+                    localStorage.setItem('compostela_github_config', JSON.stringify(this.githubConfig));
+                    this.showGithubModal = false;
+                    this.showToast('✅ Conexión con GitHub guardada. Sincronización automática activa.');
+
+                    this.syncToGithub('Inicialización de panel de licencias');
+                },
+
+                disconnectGithub() {
+                    if (confirm('¿Desconectar la sincronización automática con GitHub?')) {
+                        this.githubConfig.token = '';
+                        this.githubConfig.repo = '';
+                        localStorage.removeItem('compostela_github_config');
+                        this.githubTestStatus = '';
+                        this.showGithubModal = false;
+                        this.showToast('GitHub desconectado.');
+                    }
+                },
+
+                async fetchFromGithub() {
+                    if (!this.githubConfig.token || !this.githubConfig.repo) return false;
+                    try {
+                        let repo = this.githubConfig.repo.trim();
+                        let path = this.githubConfig.path || 'licenses.json';
+                        let branch = this.githubConfig.branch || 'main';
+                        let url = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}&t=${Date.now()}`;
+
+                        let res = await fetch(url, {
+                            headers: {
+                                'Authorization': 'Bearer ' + this.githubConfig.token,
+                                'Accept': 'application/vnd.github+json'
+                            }
+                        });
+
+                        if (res.ok) {
+                            let data = await res.json();
+                            if (data.content) {
+                                let decoded = decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))));
+                                let parsed = JSON.parse(decoded);
+                                if (Array.isArray(parsed) && parsed.length > 0) {
+                                    this.licenses = parsed;
+                                    this.githubFileSha = data.sha;
+                                    localStorage.setItem('compostela_licenses_cloud', JSON.stringify(parsed));
+                                    return true;
+                                }
+                            }
+                        }
+                    } catch(e) {}
+                    return false;
+                },
+
+                async syncToGithub(commitMsg = 'Actualización de licencias [Kill-Switch Cloud]') {
+                    if (!this.githubConfig.token || !this.githubConfig.repo) return;
+                    this.isSyncingGithub = true;
+
+                    try {
+                        let repo = this.githubConfig.repo.trim();
+                        let path = this.githubConfig.path || 'licenses.json';
+                        let branch = this.githubConfig.branch || 'main';
+
+                        let getUrl = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}&t=${Date.now()}`;
+                        let sha = this.githubFileSha;
+
+                        let getRes = await fetch(getUrl, {
+                            headers: {
+                                'Authorization': 'Bearer ' + this.githubConfig.token,
+                                'Accept': 'application/vnd.github+json'
+                            }
+                        });
+
+                        if (getRes.ok) {
+                            let fileInfo = await getRes.json();
+                            sha = fileInfo.sha;
+                        }
+
+                        let jsonStr = JSON.stringify(this.licenses, null, 2);
+                        let contentBase64 = btoa(unescape(encodeURIComponent(jsonStr)));
+
+                        let putUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
+                        let payload = {
+                            message: commitMsg,
+                            content: contentBase64,
+                            branch: branch
+                        };
+                        if (sha) payload.sha = sha;
+
+                        let putRes = await fetch(putUrl, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': 'Bearer ' + this.githubConfig.token,
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/vnd.github+json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (putRes.ok) {
+                            let result = await putRes.json();
+                            this.githubFileSha = result.content?.sha;
+                            this.showToast('☁️ ¡Guardado en GitHub en vivo! Commit automático completado.');
+                        } else {
+                            let err = await putRes.json();
+                            this.showToast('⚠️ Error al subir a GitHub: ' + (err.message || 'Verifica permisos'));
+                        }
+                    } catch(e) {
+                        this.showToast('⚠️ Error de conexión con GitHub API');
+                    } finally {
+                        this.isSyncingGithub = false;
+                    }
+                },
+
+                async saveLocal(actionMsg = 'Actualización de licencias') {
+                    localStorage.setItem('compostela_licenses_cloud', JSON.stringify(this.licenses));
+
+                    if (this.githubConfig.token && this.githubConfig.repo) {
+                        this.syncToGithub(actionMsg);
+                    }
+
+                    try {
+                        let res = await fetch('http://localhost:8000/api/license-cloud/sync', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(this.licenses)
+                        });
+                        if (res.ok) {
+                            let data = await res.json();
+                            if (data.status === 'revoked') {
+                                this.showToast('🚨 SISTEMA BLOQUEADO: El software del cliente ha sido suspendido.');
+                            } else if (data.status === 'active') {
+                                this.showToast('✅ SISTEMA REACTIVADO: La farmacia vuelve a operar normalmente.');
+                            }
+                        }
+                    } catch(e) {}
+                },
+
+                filteredLicenses() {
+                    let q = this.searchQuery.toLowerCase().trim();
+                    let list = this.licenses.filter(item => {
+                        let matchesStatus = this.filterStatus === 'todos' || item.estado === this.filterStatus;
+                        let matchesQuery = !q ||
+                            item.cliente.toLowerCase().includes(q) ||
+                            item.hwid.toLowerCase().includes(q) ||
+                            (item.rol && item.rol.toLowerCase().includes(q)) ||
+                            (item.lan_grupo && item.lan_grupo.toLowerCase().includes(q)) ||
+                            (item.ciudad && item.ciudad.toLowerCase().includes(q)) ||
+                            (item.sistema && item.sistema.toLowerCase().includes(q));
+                        return matchesStatus && matchesQuery;
+                    });
+
+                    // Agrupación y Orden Jerárquico: El Servidor primero y sus Clientes tabulados/anidados debajo
+                    let grouped = [];
+                    let servers = list.filter(l => (l.tipo_nodo || 'servidor') === 'servidor');
+                    let clients = list.filter(l => l.tipo_nodo === 'cliente');
+
+                    servers.forEach(srv => {
+                        grouped.push(srv);
+                        let subs = clients.filter(c => (c.parent_id === srv.id) || (c.lan_grupo && c.lan_grupo === srv.lan_grupo && c.cliente === srv.cliente));
+                        grouped.push(...subs);
+                    });
+
+                    // Si hay terminales huérfanas o sin servidor encontrado
+                    let orphans = clients.filter(c => !grouped.includes(c));
+                    grouped.push(...orphans);
+
+                    return grouped;
+                },
+
+                activeCount() {
+                    return this.licenses.filter(l => l.estado === 'activa').length;
+                },
+
+                revokedCount() {
+                    return this.licenses.filter(l => l.estado === 'revocada').length;
+                },
+
+                uniqueClients() {
+                    return new Set(this.licenses.map(l => l.lan_grupo || l.cliente)).size;
+                },
+
+                saveNewLicense() {
+                    let nextId = 'LIC-2026-' + String(this.licenses.length + 1).padStart(3, '0');
+                    let newEntry = {
+                        id: nextId,
+                        cliente: this.newForm.cliente,
+                        sistema: this.newForm.sistema || 'Farmacia Compostela POS v2.0',
+                        tipo_nodo: this.newForm.tipo_nodo || 'cliente',
+                        parent_id: this.newForm.parent_id || '',
+                        rol: this.newForm.rol || (this.newForm.tipo_nodo === 'servidor' ? 'Caja Central / Servidor Principal' : 'Terminal Mostrador / Caja 2'),
+                        lan_grupo: this.newForm.lan_grupo || 'LAN-COMPOSTELA',
+                        hwid: this.newForm.hwid.toUpperCase().trim(),
+                        tipo: this.newForm.tipo,
+                        estado: 'activa',
+                        terminales: this.newForm.tipo_nodo === 'servidor' ? 2 : 1,
+                        fecha_emision: new Date().toISOString().slice(0, 10),
+                        ultimo_checkin: 'Recién registrado',
+                        ip_publica: this.newForm.ip_publica || '',
+                        ip_local: this.newForm.ip_local || this.newForm.ip || '192.168.100.x',
+                        ip: this.newForm.ip_local || this.newForm.ip || 'Red Local',
+                        ciudad: this.newForm.ciudad,
+                        contacto: this.newForm.contacto,
+                        notas: this.newForm.tipo_nodo === 'servidor' ? 'Servidor Central + Base de Datos' : 'Terminal Subordinada LAN'
+                    };
+
+                    this.licenses.unshift(newEntry);
+                    this.saveLocal('Nueva licencia creada: ' + newEntry.cliente + ' (' + newEntry.rol + ')');
+                    this.showNewModal = false;
+                    this.showToast('¡Licencia registrada! Sincronizada con la nube.');
+
+                    this.newForm = {
+                        tipo_nodo: 'cliente',
+                        parent_id: '',
+                        cliente: 'Farmacia Compostela',
+                        sistema: 'Farmacia Compostela POS v2.0',
+                        rol: 'Terminal Mostrador / Caja 2',
+                        lan_grupo: 'LAN-COMPOSTELA',
+                        hwid: '',
+                        tipo: 'perpetua',
+                        ip: '192.168.100.',
+                        ciudad: 'Bolivia',
+                        contacto: '+591 70471057'
+                    };
+                },
+
+                toggleStatus(item) {
+                    item.estado = item.estado === 'activa' ? 'revocada' : 'activa';
+                    let accion = item.estado === 'revocada' ? ('Bloqueo remoto: ' + item.cliente + ' - ' + (item.rol || '')) : ('Reactivación: ' + item.cliente);
+                    this.saveLocal(accion);
+                    if (item.estado === 'revocada') {
+                        this.showToast('⚠️ Licencia BLOQUEADA. Guardado en la nube.');
+                    } else {
+                        this.showToast('✅ Licencia Reactivada. Guardado en la nube.');
+                    }
+                },
+
+                deleteLicense(id) {
+                    if (confirm('¿ELIMINAR ESTA LICENCIA?\n\nAl eliminarla, el sistema del cliente detectará que ya no existe en la nube y se BLOQUEARÁ automáticamente.')) {
+                        let target = this.licenses.find(l => l.id === id);
+                        let name = target ? (target.cliente + ' [' + target.rol + ']') : id;
+                        this.licenses = this.licenses.filter(l => l.id !== id);
+                        this.saveLocal('Eliminada licencia de: ' + name);
+                        this.showToast('Licencia eliminada. Guardado en la nube.');
+                    }
+                },
+
+                copyHwid(hwid) {
+                    navigator.clipboard.writeText(hwid);
+                    this.showToast('¡HWID copiado al portapapeles!');
+                },
+
+                exportJson() {
+                    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.licenses, null, 2));
+                    let downloadAnchor = document.createElement('a');
+                    downloadAnchor.setAttribute("href", dataStr);
+                    downloadAnchor.setAttribute("download", "licenses.json");
+                    document.body.appendChild(downloadAnchor);
+                    downloadAnchor.click();
+                    downloadAnchor.remove();
+                    this.showToast('Archivo licenses.json descargado.');
+                },
+
+                exportCsv() {
+                    let headers = ['ID', 'Cliente', 'Rol / Estacion', 'Grupo LAN', 'Software', 'HWID', 'Tipo', 'Estado', 'Cajas', 'Fecha Emision', 'Ultimo Checkin', 'Ciudad', 'Contacto'];
+                    let rows = this.licenses.map(l => [
+                        l.id, `"${l.cliente}"`, `"${l.rol || ''}"`, `"${l.lan_grupo || ''}"`, `"${l.sistema}"`, l.hwid, l.tipo, l.estado, l.terminales, l.fecha_emision, `"${l.ultimo_checkin}"`, `"${l.ciudad}"`, `"${l.contacto}"`
+                    ]);
+                    let csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+                    let encodedUri = encodeURI(csvContent);
+                    let link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", "licencias_globales_" + new Date().toISOString().slice(0, 10) + ".csv");
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    this.showToast('Planilla Excel CSV descargada.');
+                },
+
+                showToast(msg) {
+                    this.toast.message = msg;
+                    this.toast.visible = true;
+                    setTimeout(() => { this.toast.visible = false; }, 4000);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
