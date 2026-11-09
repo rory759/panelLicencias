@@ -341,15 +341,17 @@
 
                                         <!-- Bloquear / Reactivar -->
                                         <button type="button" @click="toggleStatus(item)"
+                                            :disabled="isSyncingGithub"
                                             :class="item.estado === 'activa' ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30'"
-                                            class="px-3 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5 cursor-pointer">
-                                            <i class="fa-solid" :class="item.estado === 'activa' ? 'fa-ban' : 'fa-check'"></i>
-                                            <span x-text="item.estado === 'activa' ? 'Bloquear' : 'Reactivar'"></span>
+                                            class="px-3 py-1.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <i class="fa-solid" :class="isSyncingGithub ? 'fa-spinner fa-spin' : (item.estado === 'activa' ? 'fa-ban' : 'fa-check')"></i>
+                                            <span x-text="isSyncingGithub ? 'Guardando...' : (item.estado === 'activa' ? 'Bloquear' : 'Reactivar')"></span>
                                         </button>
 
                                         <!-- Eliminar -->
                                         <button type="button" @click="deleteLicense(item.id)" title="Eliminar definitivamente"
-                                            class="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer">
+                                            :disabled="isSyncingGithub"
+                                            class="p-2 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                                             <i class="fa-solid fa-trash-can text-xs"></i>
                                         </button>
                                     </div>
@@ -883,15 +885,15 @@
                     this.isSyncingGithub = true;
 
                     try {
-                        let repo = this.githubConfig.repo.trim().replace(/^https:\/\/github\.com\//, '').replace(/\/$/, '');
+                        let repo = this.githubConfig.repo.trim().replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/\/$/, '');
                         let path = (this.githubConfig.path || 'licenses.json').trim().replace(/^\//, '');
                         let branch = (this.githubConfig.branch || 'main').trim();
                         let token = this.githubConfig.token.trim();
 
-                        // 1. Obtener siempre el SHA actual del archivo en GitHub con no-cache
+                        // 1. Obtener siempre el SHA actual del archivo en GitHub en tiempo real (sin caché)
                         let sha = this.githubFileSha || null;
                         try {
-                            let getUrl = `https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}&t=${Date.now()}`;
+                            let getUrl = `https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}&_t=${Date.now()}`;
                             let getRes = await fetch(getUrl, {
                                 cache: 'no-store',
                                 headers: {
@@ -934,32 +936,22 @@
                         });
 
                         // 4. Auto-recuperación si hay conflicto de SHA (409 Conflict)
+                        // Si otro commit cambió licenses.json una fracción de segundo antes, consultamos a GitHub
+                        // por el nuevo SHA real y reintentamos inmediatamente de forma transparente.
                         if (putRes.status === 409) {
-                            let errData = await putRes.json().catch(() => ({}));
-                            let matchedSha = null;
-                            if (errData.message) {
-                                let match = errData.message.match(/([a-f0-9]{40})/);
-                                if (match) matchedSha = match[1];
-                            }
-
-                            if (!matchedSha) {
-                                let freshGet = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}&_nocache=${Date.now()}`, {
-                                    cache: 'no-store',
-                                    headers: {
-                                        'Authorization': 'Bearer ' + token,
-                                        'Accept': 'application/vnd.github+json',
-                                        'X-GitHub-Api-Version': '2022-11-28'
-                                    }
-                                });
-                                if (freshGet.ok) {
-                                    let freshInfo = await freshGet.json();
-                                    matchedSha = freshInfo.sha;
+                            await new Promise(r => setTimeout(r, 300));
+                            let freshGet = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}&_retry=${Date.now()}`, {
+                                cache: 'no-store',
+                                headers: {
+                                    'Authorization': 'Bearer ' + token,
+                                    'Accept': 'application/vnd.github+json',
+                                    'X-GitHub-Api-Version': '2022-11-28'
                                 }
-                            }
-
-                            if (matchedSha) {
-                                payload.sha = matchedSha;
-                                this.githubFileSha = matchedSha;
+                            });
+                            if (freshGet.ok) {
+                                let freshInfo = await freshGet.json();
+                                payload.sha = freshInfo.sha;
+                                this.githubFileSha = freshInfo.sha;
                                 putRes = await fetch(putUrl, {
                                     method: 'PUT',
                                     headers: {
@@ -976,7 +968,7 @@
                         if (putRes.ok) {
                             let result = await putRes.json();
                             this.githubFileSha = result.content?.sha;
-                            this.showToast('☁️ ¡Guardado en GitHub en vivo! Commit automático completado.');
+                            this.showToast('☁️ ¡Guardado en GitHub en vivo! Commit completado.');
                         } else {
                             let err = await putRes.json().catch(() => ({}));
                             this.showToast('⚠️ Error al subir a GitHub: ' + (err.message || 'Verifica permisos'));
@@ -1101,23 +1093,31 @@
                 },
 
                 toggleStatus(item) {
+                    if (this.isSyncingGithub) {
+                        this.showToast('⏳ Sincronizando con la nube, espera un segundo...');
+                        return;
+                    }
                     item.estado = item.estado === 'activa' ? 'revocada' : 'activa';
                     let accion = item.estado === 'revocada' ? ('Bloqueo remoto: ' + item.cliente + ' - ' + (item.rol || '')) : ('Reactivación: ' + item.cliente);
                     this.saveLocal(accion);
                     if (item.estado === 'revocada') {
-                        this.showToast('⚠️ Licencia BLOQUEADA. Guardado en la nube.');
+                        this.showToast('⚠️ Licencia BLOQUEADA. Guardando en la nube...');
                     } else {
-                        this.showToast('✅ Licencia Reactivada. Guardado en la nube.');
+                        this.showToast('✅ Licencia Reactivada. Guardando en la nube...');
                     }
                 },
 
                 deleteLicense(id) {
+                    if (this.isSyncingGithub) {
+                        this.showToast('⏳ Sincronizando con la nube, espera un segundo...');
+                        return;
+                    }
                     if (confirm('¿ELIMINAR ESTA LICENCIA?\n\nAl eliminarla, el sistema del cliente detectará que ya no existe en la nube y se BLOQUEARÁ automáticamente.')) {
                         let target = this.licenses.find(l => l.id === id);
                         let name = target ? (target.cliente + ' [' + target.rol + ']') : id;
                         this.licenses = this.licenses.filter(l => l.id !== id);
                         this.saveLocal('Eliminada licencia de: ' + name);
-                        this.showToast('Licencia eliminada. Guardado en la nube.');
+                        this.showToast('Licencia eliminada. Guardando en la nube...');
                     }
                 },
 
