@@ -8,7 +8,7 @@
     "lan_grupo": "LAN-COMPOSTELA",
     "hwid": "MATU-DD98-6E36-9FE6-A552",
     "tipo": "perpetua",
-    "estado": "activa",
+    "estado": "revocada",
     "terminales": 2,
     "fecha_emision": "2026-11-08",
     "ultimo_checkin": "En línea",
