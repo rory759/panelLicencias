@@ -1,1 +1,43 @@
-[]
+[
+  {
+    "id": "LIC-2026-001",
+    "cliente": "Farmacia Compostela",
+    "sistema": "Farmacia Compostela POS v2.0",
+    "tipo_nodo": "servidor",
+    "rol": "Caja Central / Servidor Principal",
+    "lan_grupo": "LAN-COMPOSTELA",
+    "hwid": "MATU-DD98-6E36-9FE6-A552",
+    "tipo": "perpetua",
+    "estado": "revocada",
+    "terminales": 2,
+    "fecha_emision": "2026-11-08",
+    "ultimo_checkin": "En línea",
+    "ip_publica": "181.115.171.116 (Bolivia)",
+    "ip_local": "192.168.100.5 (Servidor)",
+    "ip": "181.115.171.116",
+    "ciudad": "Bolivia",
+    "contacto": "+591 70471057",
+    "notas": "Servidor Central + Base de Datos"
+  },
+  {
+    "id": "LIC-2026-002",
+    "cliente": "Farmacia Compostela",
+    "sistema": "Farmacia Compostela POS v2.0",
+    "tipo_nodo": "cliente",
+    "parent_id": "LIC-2026-001",
+    "rol": "Terminal de Mostrador / Caja 2",
+    "lan_grupo": "LAN-COMPOSTELA",
+    "hwid": "MATU-TERM-7B29-41C8-9901",
+    "tipo": "perpetua",
+    "estado": "revocada",
+    "terminales": 1,
+    "fecha_emision": "2026-11-08",
+    "ultimo_checkin": "En línea",
+    "ip_publica": "181.115.171.116 (Bolivia)",
+    "ip_local": "192.168.100.22 (Terminal Wi-Fi)",
+    "ip": "192.168.100.22",
+    "ciudad": "Bolivia",
+    "contacto": "+591 70471057",
+    "notas": "Punto de Venta Remoto (Misma LAN)"
+  }
+]
