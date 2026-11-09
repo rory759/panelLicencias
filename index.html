@@ -823,9 +823,9 @@
                 },
 
                 async saveGithubConfig() {
-                    this.githubConfig.repo = this.githubConfig.repo.trim();
+                    this.githubConfig.repo = this.githubConfig.repo.trim().replace(/^https?:\/\/github\.com\//i, '').replace(/\/$/, '');
                     this.githubConfig.branch = (this.githubConfig.branch || 'main').trim();
-                    this.githubConfig.path = (this.githubConfig.path || 'licenses.json').trim();
+                    this.githubConfig.path = (this.githubConfig.path || 'licenses.json').trim().replace(/^\//, '');
                     this.githubConfig.token = this.githubConfig.token.trim();
 
                     localStorage.setItem('compostela_github_config', JSON.stringify(this.githubConfig));
@@ -883,25 +883,33 @@
                     this.isSyncingGithub = true;
 
                     try {
-                        let repo = this.githubConfig.repo.trim();
-                        let path = this.githubConfig.path || 'licenses.json';
-                        let branch = this.githubConfig.branch || 'main';
+                        let repo = this.githubConfig.repo.trim().replace(/^https:\/\/github\.com\//, '').replace(/\/$/, '');
+                        let path = (this.githubConfig.path || 'licenses.json').trim().replace(/^\//, '');
+                        let branch = (this.githubConfig.branch || 'main').trim();
+                        let token = this.githubConfig.token.trim();
 
-                        let getUrl = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}&t=${Date.now()}`;
-                        let sha = this.githubFileSha;
-
-                        let getRes = await fetch(getUrl, {
-                            headers: {
-                                'Authorization': 'Bearer ' + this.githubConfig.token,
-                                'Accept': 'application/vnd.github+json'
+                        // 1. Obtener siempre el SHA actual del archivo en GitHub con no-cache
+                        let sha = this.githubFileSha || null;
+                        try {
+                            let getUrl = `https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}&t=${Date.now()}`;
+                            let getRes = await fetch(getUrl, {
+                                cache: 'no-store',
+                                headers: {
+                                    'Authorization': 'Bearer ' + token,
+                                    'Accept': 'application/vnd.github+json',
+                                    'X-GitHub-Api-Version': '2022-11-28'
+                                }
+                            });
+                            if (getRes.ok) {
+                                let fileInfo = await getRes.json();
+                                sha = fileInfo.sha;
+                                this.githubFileSha = sha;
                             }
-                        });
-
-                        if (getRes.ok) {
-                            let fileInfo = await getRes.json();
-                            sha = fileInfo.sha;
+                        } catch(e) {
+                            console.warn('No se pudo obtener SHA previo:', e);
                         }
 
+                        // 2. Preparar el contenido Base64
                         let jsonStr = JSON.stringify(this.licenses, null, 2);
                         let contentBase64 = btoa(unescape(encodeURIComponent(jsonStr)));
 
@@ -913,22 +921,64 @@
                         };
                         if (sha) payload.sha = sha;
 
+                        // 3. Enviar actualización (PUT)
                         let putRes = await fetch(putUrl, {
                             method: 'PUT',
                             headers: {
-                                'Authorization': 'Bearer ' + this.githubConfig.token,
+                                'Authorization': 'Bearer ' + token,
                                 'Content-Type': 'application/json',
-                                'Accept': 'application/vnd.github+json'
+                                'Accept': 'application/vnd.github+json',
+                                'X-GitHub-Api-Version': '2022-11-28'
                             },
                             body: JSON.stringify(payload)
                         });
+
+                        // 4. Auto-recuperación si hay conflicto de SHA (409 Conflict)
+                        if (putRes.status === 409) {
+                            let errData = await putRes.json().catch(() => ({}));
+                            let matchedSha = null;
+                            if (errData.message) {
+                                let match = errData.message.match(/([a-f0-9]{40})/);
+                                if (match) matchedSha = match[1];
+                            }
+
+                            if (!matchedSha) {
+                                let freshGet = await fetch(`https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}&_nocache=${Date.now()}`, {
+                                    cache: 'no-store',
+                                    headers: {
+                                        'Authorization': 'Bearer ' + token,
+                                        'Accept': 'application/vnd.github+json',
+                                        'X-GitHub-Api-Version': '2022-11-28'
+                                    }
+                                });
+                                if (freshGet.ok) {
+                                    let freshInfo = await freshGet.json();
+                                    matchedSha = freshInfo.sha;
+                                }
+                            }
+
+                            if (matchedSha) {
+                                payload.sha = matchedSha;
+                                this.githubFileSha = matchedSha;
+                                putRes = await fetch(putUrl, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Authorization': 'Bearer ' + token,
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/vnd.github+json',
+                                        'X-GitHub-Api-Version': '2022-11-28'
+                                    },
+                                    body: JSON.stringify(payload)
+                                });
+                            }
+                        }
 
                         if (putRes.ok) {
                             let result = await putRes.json();
                             this.githubFileSha = result.content?.sha;
                             this.showToast('☁️ ¡Guardado en GitHub en vivo! Commit automático completado.');
                         } else {
-                            let err = await putRes.json();
+                            let err = await putRes.json().catch(() => ({}));
                             this.showToast('⚠️ Error al subir a GitHub: ' + (err.message || 'Verifica permisos'));
                         }
                     } catch(e) {
